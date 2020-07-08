@@ -4,5 +4,10 @@
   "description": "mtg daily price updater",
   "main": "index.js",
   "author": "waiting7777",
-  "license": "MIT"
+  "license": "MIT",
+  "dependencies": {
+    "axios": "^0.19.2",
+    "dotenv": "^8.2.0",
+    "mysql": "^2.18.1"
+  }
 }
