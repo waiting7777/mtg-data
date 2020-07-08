@@ -1,0 +1,8 @@
+{
+  "name": "mtg-data",
+  "version": "1.0.0",
+  "description": "mtg daily price updater",
+  "main": "index.js",
+  "author": "waiting7777",
+  "license": "MIT"
+}
