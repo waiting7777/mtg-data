@@ -72,10 +72,72 @@ async function test() {
     const yesterday = `${d.getFullYear()}-${d.getMonth()+1}-${d.getDate()-1}`
     const queryString = `SELECT * FROM daily_price WHERE rarity="Mythic" and created_at > "${yesterday}" and created_at < '${today}`
     console.log(queryString)
-    // client.pushMessage('R5fc2ceb74df4c8d5cb603faf62b7d0ef', {
-    //     type: 'text',
-    //     text: 'test'
-    // })
+    const res = queryDB(queryString)
+    const cardContents = []
+    res.forEach(v => {
+        cardContents.push({
+            "type": "box",
+            "layout": "horizontal",
+            "contents": [
+              {
+                "type": "text",
+                "text": `${v.card_name}`,
+                "flex": 2
+              },
+              {
+                "type": "text",
+                "text": `$${v.card_price}`,
+                "align": "end",
+                "flex": 1,
+                // "color": "#70a802"
+              }
+            ]
+        })
+    })
+    const replyJSON = {
+        "type": "carousel",
+        "contents": [
+          {
+            "type": "bubble",
+            "header": {
+              "type": "box",
+              "layout": "vertical",
+              "contents": [
+                {
+                  "type": "text",
+                  "text": "M21-Mythic",
+                  "weight": "bold"
+                }
+              ]
+            },
+            "body": {
+              "type": "box",
+              "layout": "vertical",
+              "contents": cardContents
+            }
+          },
+          {
+            "type": "bubble",
+            "header": {
+              "type": "box",
+              "layout": "vertical",
+              "contents": [
+                {
+                  "type": "text",
+                  "text": "M21-Rare",
+                  "weight": "bold"
+                }
+              ]
+            },
+            "body": {
+              "type": "box",
+              "layout": "vertical",
+              "contents": cardContents
+            }
+          }
+        ]
+    }
+    client.pushMessage('R5fc2ceb74df4c8d5cb603faf62b7d0ef', replyJSON)
 }
 
 test()
