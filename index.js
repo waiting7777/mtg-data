@@ -1,6 +1,7 @@
 require('dotenv').config()
 const axios = require('axios')
 const mysql = require('mysql')
+const line = require('@line/bot-sdk')
 
 const connection = mysql.createConnection({
     host: process.env.DB_HOST,
@@ -9,7 +10,14 @@ const connection = mysql.createConnection({
     database: process.env.DB_DATABASE
 })
 
-connection.connect()
+// connection.connect()
+
+const config = {
+    channelAccessToken: process.env.CHANNELACCESSTOKEN,
+    channelSecret: process.env.CHANNELSECRET
+}
+
+const client = new line.Client(config)
 
 function doGet(url) {
     return new Promise((resolve, reject) => {
@@ -43,7 +51,7 @@ async function main() {
     const dataM = resM.data.filter(v => v.collector_number < 274)
     dataM.forEach(d => {
         const queryString = `INSERT INTO daily_price (card_name, rarity, price) values (\"${d.name}\", "Mythic",  \"${d.prices.usd}\")`
-        queryDB(queryString)
+        // queryDB(queryString)
         console.log(queryString)
     })
     const resR = await doGet('https://api.scryfall.com/cards/search?q=set:m21+rarity:r')
@@ -51,9 +59,18 @@ async function main() {
     dataR.forEach(d => {
         console.log(`${d.name} ${d.prices.usd}`)
         const queryString = `INSERT INTO daily_price (card_name, rarity, price) values (\"${d.name}\", "Rare", \"${d.prices.usd}\")`
-        queryDB(queryString)
+        // queryDB(queryString)
         console.log(queryString)
     })
 }
 
-main()
+// main()
+
+async function test() {
+    client.pushMessage('R5fc2ceb74df4c8d5cb603faf62b7d0ef', {
+        type: 'text',
+        text: 'test'
+    })
+}
+
+test()
