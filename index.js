@@ -67,10 +67,15 @@ async function main() {
 // main()
 
 async function test() {
-    client.pushMessage('R5fc2ceb74df4c8d5cb603faf62b7d0ef', {
-        type: 'text',
-        text: 'test'
-    })
+    const d = new Date()
+    const today = `${d.getFullYear()}-${d.getMonth()+1}-${d.getDate()}`
+    const yesterday = `${d.getFullYear()}-${d.getMonth()+1}-${d.getDate()-1}`
+    const queryString = `SELECT * FROM daily_price WHERE rarity="Mythic" and created_at > "${yesterday}" and created_at < '${today}`
+    console.log(queryString)
+    // client.pushMessage('R5fc2ceb74df4c8d5cb603faf62b7d0ef', {
+    //     type: 'text',
+    //     text: 'test'
+    // })
 }
 
 test()
