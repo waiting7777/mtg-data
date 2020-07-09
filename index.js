@@ -42,7 +42,7 @@ async function main() {
     const resM = await doGet('https://api.scryfall.com/cards/search?q=set:m21+rarity:m')
     const dataM = resM.data.filter(v => v.collector_number < 274)
     dataM.forEach(d => {
-        const queryString = `INSERT INTO daily_price (card_name, price) values (\'${d.name}\', \'${d.prices.usd}\')`
+        const queryString = `INSERT INTO daily_price (card_name, rarity, price) values (\"${d.name}\", "Mythic",  \"${d.prices.usd}\")`
         queryDB(queryString)
         console.log(queryString)
     })
@@ -50,7 +50,7 @@ async function main() {
     const dataR = resR.data.filter(v => v.collector_number < 274)
     dataR.forEach(d => {
         console.log(`${d.name} ${d.prices.usd}`)
-        const queryString = `INSERT INTO daily_price (card_name, price) values (\'${d.name}\', \'${d.prices.usd}\')`
+        const queryString = `INSERT INTO daily_price (card_name, rarity, price) values (\"${d.name}\", "Rare", \"${d.prices.usd}\")`
         queryDB(queryString)
         console.log(queryString)
     })
