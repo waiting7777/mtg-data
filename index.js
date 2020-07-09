@@ -82,7 +82,7 @@ async function getPrice(rarity, time) {
               },
               {
                 "type": "text",
-                "text": `$${v.card_price}`,
+                "text": `$${v.price}`,
                 "align": "end",
                 "flex": 1,
                 // "color": "#70a802"
