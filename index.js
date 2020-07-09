@@ -66,16 +66,12 @@ async function main() {
 
 // main()
 
-async function test() {
-    const d = new Date()
-    const today = `${d.getFullYear()}-${d.getMonth()+1}-${d.getDate()}`
-    const yesterday = `${d.getFullYear()}-${d.getMonth()+1}-${d.getDate()-1}`
-    const queryString = `SELECT * FROM daily_price WHERE rarity="Mythic" and created_at > "${yesterday}" and created_at < "${today}"`
-    console.log(queryString)
+async function getPrice(rarity, time) {
+    const queryString = `SELECT * FROM daily_price WHERE rarity="${rarity}" and created_at > "${time}"`
     const res = await queryDB(queryString)
-    const cardContents = []
+    const contents = []
     res.forEach(v => {
-        cardContents.push({
+        contents.push({
             "type": "box",
             "layout": "horizontal",
             "contents": [
@@ -94,6 +90,16 @@ async function test() {
             ]
         })
     })
+    return contents
+}
+
+function test() {
+    const d = new Date()
+    const today = `${d.getFullYear()}-${d.getMonth()+1}-${d.getDate()}`
+    // const yesterday = `${d.getFullYear()}-${d.getMonth()+1}-${d.getDate()-1}`
+    const mythicContent = getPrice('Mythic', today)
+    const rareContent = getPrice('Rare', today)
+    
     const replyJSON = {
         "type": "carousel",
         "contents": [
@@ -101,38 +107,48 @@ async function test() {
             "type": "bubble",
             "header": {
               "type": "box",
-              "layout": "vertical",
+              "layout": "horizontal",
               "contents": [
                 {
                   "type": "text",
                   "text": "M21-Mythic",
                   "weight": "bold"
+                },
+                {
+                    "type": "text",
+                    "text": `${today}`,
+                    "align": "end"
                 }
               ]
             },
             "body": {
               "type": "box",
               "layout": "vertical",
-              "contents": cardContents
+              "contents": mythicContent
             }
           },
           {
             "type": "bubble",
             "header": {
               "type": "box",
-              "layout": "vertical",
+              "layout": "horizontal",
               "contents": [
                 {
                   "type": "text",
                   "text": "M21-Rare",
                   "weight": "bold"
+                },
+                {
+                    "type": "text",
+                    "text": `${today}`,
+                    "align": "end"
                 }
               ]
             },
             "body": {
               "type": "box",
               "layout": "vertical",
-              "contents": cardContents
+              "contents": rareContent
             }
           }
         ]
