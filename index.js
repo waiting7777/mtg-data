@@ -137,7 +137,11 @@ async function test() {
           }
         ]
     }
-    client.pushMessage('R5fc2ceb74df4c8d5cb603faf62b7d0ef', replyJSON).then(res => console.log(res)).catch(err => console.log(err.originalError.response.data))
+    client.pushMessage('R5fc2ceb74df4c8d5cb603faf62b7d0ef', {
+        type: 'flex',
+        altText: 'Daily Price',
+        contents: replyJSON
+    }).then(res => console.log(res)).catch(err => console.log(err.originalError.response.data))
 }
 
 test()
