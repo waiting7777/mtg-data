@@ -97,8 +97,8 @@ function test() {
     const d = new Date()
     const today = `${d.getFullYear()}-${d.getMonth()+1}-${d.getDate()}`
     // const yesterday = `${d.getFullYear()}-${d.getMonth()+1}-${d.getDate()-1}`
-    const mythicContent = getPrice('Mythic', today)
-    const rareContent = getPrice('Rare', today)
+    const mythicContent = await getPrice('Mythic', today)
+    const rareContent = await getPrice('Rare', today)
     
     const replyJSON = {
         "type": "carousel",
