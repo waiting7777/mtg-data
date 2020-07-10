@@ -64,6 +64,16 @@ async function main() {
     })
 }
 
+function stringColor(diff) {
+  if (diff == 0) {
+    return '#000000'
+  } else if (diff > 0) {
+    return '#70a802'
+  } else {
+    return '#ea036f'
+  }
+}
+
 async function getPrice(rarity, today, yesterday) {
     let queryString = `SELECT * FROM daily_price WHERE rarity="${rarity}" and created_at > "${today}"`
     const res = await queryDB(queryString)
@@ -79,14 +89,14 @@ async function getPrice(rarity, today, yesterday) {
               {
                 "type": "text",
                 "text": `${v.card_name}`,
-                "flex": 2
+                "flex": 3
               },
               {
                 "type": "text",
                 "text": `$${v.price}(${diff})`,
                 "align": "end",
-                "flex": 1,
-                "color": "#70a802" (diff > 0) ? '#70a802' : '#ea036f'
+                "flex": 2,
+                "color": stringColor(diff)
               }
             ]
         })
