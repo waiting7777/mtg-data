@@ -77,8 +77,11 @@ function stringColor(diff) {
 function stringNumber(diff) {
   if (diff == 0) {
     return ''
-  } else
+  } else if (diff > 0) {
+    return `(+${diff})`
+  } else {
     return `(${diff})`
+  }
 }
 
 async function getPrice(rarity, today, yesterday) {
