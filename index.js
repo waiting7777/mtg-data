@@ -64,11 +64,14 @@ async function main() {
     })
 }
 
-async function getPrice(rarity, time) {
-    const queryString = `SELECT * FROM daily_price WHERE rarity="${rarity}" and created_at > "${time}"`
+async function getPrice(rarity, today, yesterday) {
+    let queryString = `SELECT * FROM daily_price WHERE rarity="${rarity}" and created_at > "${today}"`
     const res = await queryDB(queryString)
+    queryString = `SELECT * FROM daily_price WHERE rarity="${rarity}" and created_at > "${yesterday}" and created_at < "${today}"`
+    const resYesterday = await queryDB(queryString)
     const contents = []
-    res.forEach(v => {
+    res.forEach((v, i) => {
+        const diff = Number(v.price) - Number(resYesterday[i].price)
         contents.push({
             "type": "box",
             "layout": "horizontal",
@@ -80,10 +83,10 @@ async function getPrice(rarity, time) {
               },
               {
                 "type": "text",
-                "text": `$${v.price}`,
+                "text": `$${v.price}(${diff})`,
                 "align": "end",
                 "flex": 1,
-                // "color": "#70a802"
+                "color": "#70a802" (diff > 0) ? '#70a802' : '#ea036f'
               }
             ]
         })
@@ -94,9 +97,9 @@ async function getPrice(rarity, time) {
 async function test() {
     const d = new Date()
     const today = `${d.getFullYear()}-${d.getMonth()+1}-${d.getDate()}`
-    // const yesterday = `${d.getFullYear()}-${d.getMonth()+1}-${d.getDate()-1}`
-    const mythicContent = await getPrice('Mythic', today)
-    const rareContent = await getPrice('Rare', today)
+    const yesterday = `${d.getFullYear()}-${d.getMonth()+1}-${d.getDate()-1}`
+    const mythicContent = await getPrice('Mythic', today, yesterday)
+    const rareContent = await getPrice('Rare', today, yesterday)
     
     const replyJSON = {
         "type": "carousel",
@@ -151,11 +154,11 @@ async function test() {
           }
         ]
     }
-    client.pushMessage(process.env.GROUPID, {
+    client.pushMessage('R5fc2ceb74df4c8d5cb603faf62b7d0ef', {
         type: 'flex',
         altText: 'Daily Price',
         contents: replyJSON
     }).then(res => console.log(res)).catch(err => console.log(err.originalError.response.data))
 }
 
-main()
+test()
