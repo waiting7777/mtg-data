@@ -74,6 +74,13 @@ function stringColor(diff) {
   }
 }
 
+function stringNumber(diff) {
+  if (diff == 0) {
+    return ''
+  } else
+    return `(${diff})`
+}
+
 async function getPrice(rarity, today, yesterday) {
     let queryString = `SELECT * FROM daily_price WHERE rarity="${rarity}" and created_at > "${today}"`
     const res = await queryDB(queryString)
@@ -93,7 +100,7 @@ async function getPrice(rarity, today, yesterday) {
               },
               {
                 "type": "text",
-                "text": `$${v.price}(${diff})`,
+                "text": `$${v.price}${stringNumber(diff)}`,
                 "align": "end",
                 "flex": 2,
                 "color": stringColor(diff)
