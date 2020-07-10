@@ -51,7 +51,7 @@ async function main() {
     const dataM = resM.data.filter(v => v.collector_number < 274)
     dataM.forEach(d => {
         const queryString = `INSERT INTO daily_price (card_name, rarity, price) values (\"${d.name}\", "Mythic",  \"${d.prices.usd}\")`
-        // queryDB(queryString)
+        queryDB(queryString)
         console.log(queryString)
     })
     const resR = await doGet('https://api.scryfall.com/cards/search?q=set:m21+rarity:r')
@@ -59,12 +59,10 @@ async function main() {
     dataR.forEach(d => {
         console.log(`${d.name} ${d.prices.usd}`)
         const queryString = `INSERT INTO daily_price (card_name, rarity, price) values (\"${d.name}\", "Rare", \"${d.prices.usd}\")`
-        // queryDB(queryString)
+        queryDB(queryString)
         console.log(queryString)
     })
 }
-
-// main()
 
 async function getPrice(rarity, time) {
     const queryString = `SELECT * FROM daily_price WHERE rarity="${rarity}" and created_at > "${time}"`
@@ -93,7 +91,7 @@ async function getPrice(rarity, time) {
     return contents
 }
 
-function test() {
+async function test() {
     const d = new Date()
     const today = `${d.getFullYear()}-${d.getMonth()+1}-${d.getDate()}`
     // const yesterday = `${d.getFullYear()}-${d.getMonth()+1}-${d.getDate()-1}`
@@ -153,11 +151,11 @@ function test() {
           }
         ]
     }
-    client.pushMessage('R5fc2ceb74df4c8d5cb603faf62b7d0ef', {
+    client.pushMessage(process.env.GROUPID, {
         type: 'flex',
         altText: 'Daily Price',
         contents: replyJSON
     }).then(res => console.log(res)).catch(err => console.log(err.originalError.response.data))
 }
 
-test()
+main()
