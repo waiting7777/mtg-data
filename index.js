@@ -92,6 +92,7 @@ async function getPrice(rarity, today, yesterday) {
     const contents = []
     res.forEach((v, i) => {
         const diff = +(Number(v.price) - Number(resYesterday[i].price)).toFixed(1)
+	const price = (v.price) ? v.price.toFixed(1) : 'NULL'
         contents.push({
             "type": "box",
             "layout": "horizontal",
@@ -103,7 +104,7 @@ async function getPrice(rarity, today, yesterday) {
               },
               {
                 "type": "text",
-                "text": `$${v.price}${stringNumber(diff)}`,
+                "text": `$${price}${stringNumber(diff)}`,
                 "align": "end",
                 "flex": 2,
                 "color": stringColor(diff)
@@ -174,7 +175,7 @@ async function test() {
           }
         ]
     }
-    client.pushMessage('R5fc2ceb74df4c8d5cb603faf62b7d0ef', {
+    client.pushMessage(process.env.GROUPID, {
         type: 'flex',
         altText: 'Daily Price',
         contents: replyJSON
@@ -182,3 +183,4 @@ async function test() {
 }
 
 test()
+//main()
