@@ -188,7 +188,7 @@ async function getDeck(type) {
   const res = await doGet(`https://mtgdecks.net/${type}/date-1`);
   const $ = cheerio.load(res);
   let deck_name, usage_p, img
-  $('tbody tr td').each(function(i, e) {
+  $('tbody tr td').each(async function(i, e) {
     if (i > 29) return
 
     switch(i % 6) {
@@ -202,7 +202,7 @@ async function getDeck(type) {
         usage_p = trim($(this).text())
         break
       case 5:
-        const queryString = `INSERT INTO meta (deck_name, usage_p, img, type) VALUES (${deck_name}, ${usage_p}, ${img}, ${type})`
+        const queryString = `INSERT INTO meta (deck_name, usage_p, img, type) VALUES (\'${deck_name}\', \'${usage_p}\', \'${img}\', \'${type}\')`
         const res = await queryDB(queryString)
         console.log(queryString)
     }
@@ -211,4 +211,4 @@ async function getDeck(type) {
 
 //test()
 //main()
-getDeck('Standard')
+getDeck('Modern')
