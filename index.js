@@ -2,6 +2,8 @@ require('dotenv').config()
 const axios = require('axios')
 const mysql = require('mysql')
 const line = require('@line/bot-sdk')
+const cheerio = require('cheerio')
+const { trim } = require('lodash')
 
 const connection = mysql.createConnection({
     host: process.env.DB_HOST,
@@ -182,5 +184,29 @@ async function test() {
     }).then(res => console.log(res)).catch(err => console.log(err.originalError.response.data))
 }
 
-test()
+async function getDeck(type) {
+  const res = await doGet(`https://mtgdecks.net/${type}/date-1`);
+  const $ = cheerio.load(res);
+  let deck_name, usage_p, img
+  $('tbody tr td').each(function(i, e) {
+    if (i > 29) return
+
+    switch(i % 6) {
+      case 0:
+        img = trim($(this).find('img').attr('src'))
+        break
+      case 1:
+        deck_name = trim($(this).text())
+        break
+      case 2:
+        usage_p = trim($(this).text())
+        break
+      case 5:
+        console.log(`INSERT INTO meta (deck_name, usage_p, img, type) VALUES (${deck_name}, ${usage_p}, ${img}, ${type})`)
+    }
+  })
+}
+
+//test()
 //main()
+getDeck('Standard')

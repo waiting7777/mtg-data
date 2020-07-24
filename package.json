@@ -8,7 +8,9 @@
   "dependencies": {
     "@line/bot-sdk": "^7.0.0",
     "axios": "^0.19.2",
+    "cheerio": "^1.0.0-rc.3",
     "dotenv": "^8.2.0",
+    "lodash": "^4.17.19",
     "mysql": "^2.18.1"
   }
 }
