@@ -202,7 +202,9 @@ async function getDeck(type) {
         usage_p = trim($(this).text())
         break
       case 5:
-        console.log(`INSERT INTO meta (deck_name, usage_p, img, type) VALUES (${deck_name}, ${usage_p}, ${img}, ${type})`)
+        const queryString = `INSERT INTO meta (deck_name, usage_p, img, type) VALUES (${deck_name}, ${usage_p}, ${img}, ${type})`
+        const res = await queryDB(queryString)
+        console.log(queryString)
     }
   })
 }
