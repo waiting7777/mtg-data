@@ -4,6 +4,7 @@ const mysql = require('mysql')
 const line = require('@line/bot-sdk')
 const cheerio = require('cheerio')
 const { trim } = require('lodash')
+const CronJob = require('cron').CronJob
 
 const connection = mysql.createConnection({
     host: process.env.DB_HOST,
@@ -12,7 +13,7 @@ const connection = mysql.createConnection({
     database: process.env.DB_DATABASE
 })
 
-// connection.connect()
+connection.connect()
 
 const config = {
     channelAccessToken: process.env.CHANNELACCESSTOKEN,
@@ -48,7 +49,7 @@ function queryDB(sql) {
     })
 }
 
-async function main() {
+async function getDailyPrice() {
     const resM = await doGet('https://api.scryfall.com/cards/search?q=set:m21+rarity:m')
     const dataM = resM.data.filter(v => v.collector_number < 274)
     dataM.forEach(d => {
@@ -117,7 +118,7 @@ async function getPrice(rarity, today, yesterday) {
     return contents
 }
 
-async function test() {
+async function pushDailyPrice() {
     const d = new Date()
     const today = `${d.getFullYear()}-${d.getMonth()+1}-${d.getDate()}`
     const yesterday = `${d.getFullYear()}-${d.getMonth()+1}-${d.getDate()-1}`
@@ -188,7 +189,7 @@ async function getDeck(type) {
   const res = await doGet(`https://mtgdecks.net/${type}/date-1`);
   const $ = cheerio.load(res);
   let deck_name, usage_p, img
-  $('tbody tr td').each(function(i, e) {
+  $('tbody tr td').each(async function(i, e) {
     if (i > 29) return
 
     switch(i % 6) {
@@ -209,6 +210,26 @@ async function getDeck(type) {
   })
 }
 
-//test()
-//main()
-getDeck('Standard')
+// pushDailyPrice()
+// getDailyPrice()
+// getDeck('Standard')
+
+const getPriceJob = new CronJob('* * 08 * * *', () => {
+  getDailyPrice()
+})
+
+const getPriceJob = new CronJob('30 * 08 * * *', () => {
+  pushDailyPrice()
+})
+
+const getPriceJob = new CronJob('* * 09 * * *', () => {
+  getDeck('Standard')
+  setTimeout(() => {
+    getDeck('Historic')
+  }, 3000)
+  setTimeout(() => {
+    getDeck('Modern')
+  }, 6000)
+})
+
+getPriceJob.start()
