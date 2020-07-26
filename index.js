@@ -214,15 +214,15 @@ async function getDeck(type) {
 // getDailyPrice()
 // getDeck('Standard')
 
-const getPriceJob = new CronJob('* * 08 * * *', () => {
+const getPriceJob = new CronJob('00 00 08 * * *', () => {
   getDailyPrice()
 })
 
-const pushPriceJob = new CronJob('30 * 08 * * *', () => {
+const pushPriceJob = new CronJob('30 00 08 * * *', () => {
   pushDailyPrice()
 })
 
-const getMetaJob = new CronJob('* * 09 * * *', () => {
+const getMetaJob = new CronJob('00 00 09 * * *', () => {
   getDeck('Standard')
   setTimeout(() => {
     getDeck('Historic')
