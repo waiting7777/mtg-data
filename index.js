@@ -210,19 +210,15 @@ async function getDeck(type) {
   })
 }
 
-// pushDailyPrice()
-// getDailyPrice()
-// getDeck('Standard')
-
 const getPriceJob = new CronJob('00 00 08 * * *', () => {
   getDailyPrice()
 })
 
-const pushPriceJob = new CronJob('30 00 08 * * *', () => {
+const pushPriceJob = new CronJob('00 01 08 * * *', () => {
   pushDailyPrice()
 })
 
-const getMetaJob = new CronJob('00 00 09 * * *', () => {
+const getMetaJob = new CronJob('00 30 08 * * *', () => {
   getDeck('Standard')
   setTimeout(() => {
     getDeck('Historic')
@@ -235,3 +231,4 @@ const getMetaJob = new CronJob('00 00 09 * * *', () => {
 getPriceJob.start()
 pushPriceJob.start()
 getMetaJob.start()
+
