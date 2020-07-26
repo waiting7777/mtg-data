@@ -5,6 +5,9 @@
   "main": "index.js",
   "author": "waiting7777",
   "license": "MIT",
+  "scripts": {
+    "start": "node index.js"
+  },
   "dependencies": {
     "@line/bot-sdk": "^7.0.0",
     "axios": "^0.19.2",
