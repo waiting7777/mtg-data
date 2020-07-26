@@ -218,11 +218,11 @@ const getPriceJob = new CronJob('* * 08 * * *', () => {
   getDailyPrice()
 })
 
-const getPriceJob = new CronJob('30 * 08 * * *', () => {
+const pushPriceJob = new CronJob('30 * 08 * * *', () => {
   pushDailyPrice()
 })
 
-const getPriceJob = new CronJob('* * 09 * * *', () => {
+const getMetaJob = new CronJob('* * 09 * * *', () => {
   getDeck('Standard')
   setTimeout(() => {
     getDeck('Historic')
@@ -233,3 +233,5 @@ const getPriceJob = new CronJob('* * 09 * * *', () => {
 })
 
 getPriceJob.start()
+pushPriceJob.start()
+getMetaJob.start()
