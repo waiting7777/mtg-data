@@ -95,7 +95,7 @@ async function getPrice(rarity, today, yesterday) {
     const contents = []
     res.forEach((v, i) => {
         const diff = +(Number(v.price) - Number(resYesterday[i].price)).toFixed(1)
-	const price = (v.price) ? v.price.toFixed(1) : 'NULL'
+	const price = (v.price) ? Number(v.price).toFixed(1) : 'NULL'
         contents.push({
             "type": "box",
             "layout": "horizontal",
