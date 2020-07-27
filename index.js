@@ -6,6 +6,7 @@ const cheerio = require('cheerio')
 const { trim } = require('lodash')
 const CronJob = require('cron').CronJob
 const dayjs = require('dayjs')
+const utils = require('./utils')
 
 const connection = mysql.createConnection({
     host: process.env.DB_HOST,
@@ -67,26 +68,6 @@ async function getDailyPrice() {
     })
 }
 
-function stringColor(diff) {
-  if (diff == 0) {
-    return '#000000'
-  } else if (diff > 0) {
-    return '#70a802'
-  } else {
-    return '#ea036f'
-  }
-}
-
-function stringNumber(diff) {
-  if (diff == 0) {
-    return ''
-  } else if (diff > 0) {
-    return `(+${diff})`
-  } else {
-    return `(${diff})`
-  }
-}
-
 async function getPrice(rarity, today, yesterday) {
     let queryString = `SELECT * FROM daily_price WHERE rarity="${rarity}" and created_at > "${today}"`
     const res = await queryDB(queryString)
@@ -107,10 +88,10 @@ async function getPrice(rarity, today, yesterday) {
               },
               {
                 "type": "text",
-                "text": `$${price}${stringNumber(diff)}`,
+                "text": `$${price}${utils.stringNumber(diff)}`,
                 "align": "end",
                 "flex": 2,
-                "color": stringColor(diff)
+                "color": utils.stringColor(diff)
               }
             ]
         })
