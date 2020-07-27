@@ -5,6 +5,7 @@ const line = require('@line/bot-sdk')
 const cheerio = require('cheerio')
 const { trim } = require('lodash')
 const CronJob = require('cron').CronJob
+const dayjs = require('dayjs')
 
 const connection = mysql.createConnection({
     host: process.env.DB_HOST,
@@ -60,7 +61,6 @@ async function getDailyPrice() {
     const resR = await doGet('https://api.scryfall.com/cards/search?q=set:m21+rarity:r')
     const dataR = resR.data.filter(v => v.collector_number < 274)
     dataR.forEach(d => {
-        console.log(`${d.name} ${d.prices.usd}`)
         const queryString = `INSERT INTO daily_price (card_name, rarity, price) values (\"${d.name}\", "Rare", \"${d.prices.usd}\")`
         queryDB(queryString)
         console.log(queryString)
@@ -119,9 +119,8 @@ async function getPrice(rarity, today, yesterday) {
 }
 
 async function pushDailyPrice() {
-    const d = new Date()
-    const today = `${d.getFullYear()}-${d.getMonth()+1}-${d.getDate()}`
-    const yesterday = `${d.getFullYear()}-${d.getMonth()+1}-${d.getDate()-1}`
+    const today = dayjs().format('YYYY-MM-DD')
+    const yesterday = dayjs().subtract(1, 'day').format('YYYY-MM-DD')
     const mythicContent = await getPrice('Mythic', today, yesterday)
     const rareContent = await getPrice('Rare', today, yesterday)
     
