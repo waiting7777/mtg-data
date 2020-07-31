@@ -176,7 +176,7 @@ const symbolMap = {
 async function test(type = 'historic') {
   const res = await doGet(`https://www.mtggoldfish.com/metagame/${type}#paper`)
   const $ = cheerio.load(res);
-  $('.archetype-tile').each(function(i, e) {
+  $('.archetype-tile').each(async function(i, e) {
     if (i > 11) return
     const link = $(e).find('.card-image-tile-link-overlay').attr('href')
     const deck_name = $(e).find('.deck-price-paper a').text()
@@ -239,5 +239,5 @@ const pushPriceJob = new CronJob('00 00 08 * * *', () => {
 // pushPriceJob.start()
 // getMetaJob.start()
 
-test()
+test('modern')
 
