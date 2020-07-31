@@ -15,7 +15,7 @@ const connection = mysql.createConnection({
   database: process.env.DB_DATABASE
 })
 
-// connection.connect()
+connection.connect()
 
 const config = {
   channelAccessToken: process.env.CHANNELACCESSTOKEN,
@@ -187,6 +187,7 @@ async function test(type = 'historic') {
     const symbol = JSON.stringify(temp)
     const usage_p = trim($(e).find('.col-freq').text())
     const queryString = `INSERT INTO meta (deck_name, img, usage_p, symbol, type) VALUES (\'${deck_name}\', \'${link}\', \'${usage_p}\', \'${symbol}\', \'${type}\')`
+    const res = await queryDB(queryString)
     console.log(queryString)
   })
 }
