@@ -15,7 +15,7 @@ const connection = mysql.createConnection({
   database: process.env.DB_DATABASE
 })
 
-connection.connect()
+// connection.connect()
 
 const config = {
   channelAccessToken: process.env.CHANNELACCESSTOKEN,
@@ -165,6 +165,32 @@ async function pushDailyPrice() {
     }).then(res => console.log(res)).catch(err => console.log(err.originalError.response.data))
 }
 
+const symbolMap = {
+  'white': 'W',
+  'blue': 'U',
+  'black': 'B',
+  'red': 'R',
+  'green': 'G'
+}
+
+async function test(type = 'historic') {
+  const res = await doGet(`https://www.mtggoldfish.com/metagame/${type}#paper`)
+  const $ = cheerio.load(res);
+  $('.archetype-tile').each(function(i, e) {
+    if (i > 11) return
+    const link = $(e).find('.card-image-tile-link-overlay').attr('href')
+    const deck_name = $(e).find('.deck-price-paper a').text()
+    let temp = []
+    $(e).find('.manacost img').each(function(i, e) {
+      temp.push(symbolMap[$(e).attr('alt')])
+    })
+    const symbol = JSON.stringify(temp)
+    const usage_p = trim($(e).find('.col-freq').text())
+    const queryString = `INSERT INTO meta (deck_name, img, usage_p, symbol, type) VALUES (\'${deck_name}\', \'${link}\', \'${usage_p}\', \'${symbol}\', \'${type}\')`
+    console.log(queryString)
+  })
+}
+
 async function getDeck(type) {
   const res = await doGet(`https://mtgdecks.net/${type}/date-1`);
   const $ = cheerio.load(res);
@@ -198,17 +224,19 @@ const pushPriceJob = new CronJob('00 00 08 * * *', () => {
   pushDailyPrice()
 })
 
-const getMetaJob = new CronJob('00 01 00 * * *', () => {
-  getDeck('Standard')
-  setTimeout(() => {
-    getDeck('Historic')
-  }, 3000)
-  setTimeout(() => {
-    getDeck('Modern')
-  }, 6000)
-})
+// const getMetaJob = new CronJob('00 01 00 * * *', () => {
+//   getDeck('Standard')
+//   setTimeout(() => {
+//     getDeck('Historic')
+//   }, 3000)
+//   setTimeout(() => {
+//     getDeck('Modern')
+//   }, 6000)
+// })
 
-getPriceJob.start()
-pushPriceJob.start()
-getMetaJob.start()
+// getPriceJob.start()
+// pushPriceJob.start()
+// getMetaJob.start()
+
+test()
 
