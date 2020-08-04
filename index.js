@@ -3,10 +3,11 @@ const axios = require('axios')
 const mysql = require('mysql')
 const line = require('@line/bot-sdk')
 const cheerio = require('cheerio')
-const { trim } = require('lodash')
+const { trim, cloneDeep } = require('lodash')
 const CronJob = require('cron').CronJob
 const dayjs = require('dayjs')
 const utils = require('./utils')
+const fs = require('fs');
 
 const connection = mysql.createConnection({
   host: process.env.DB_HOST,
@@ -15,7 +16,7 @@ const connection = mysql.createConnection({
   database: process.env.DB_DATABASE
 })
 
-connection.connect()
+// connection.connect()
 
 const config = {
   channelAccessToken: process.env.CHANNELACCESSTOKEN,
@@ -173,7 +174,7 @@ const symbolMap = {
   'green': 'G'
 }
 
-async function test(type = 'historic') {
+async function getGoldfishMeta(type = 'historic') {
   const res = await doGet(`https://www.mtggoldfish.com/metagame/${type}#paper`)
   const $ = cheerio.load(res);
   $('.archetype-tile').each(async function(i, e) {
@@ -239,5 +240,105 @@ const pushPriceJob = new CronJob('00 00 08 * * *', () => {
 // pushPriceJob.start()
 // getMetaJob.start()
 
-test('modern')
+// getGoldfishMeta()
 
+const manaMap = {
+  '1': '1',
+  '2': '2',
+  '3': '3',
+  '4': '4',
+  '5': '5',
+  '6': '6',
+  '7': '7',
+  '8': '8',
+  '9': '9',
+  '0': '0',
+  'x': 'X',
+  'white': 'W',
+  'blue': 'U',
+  'black': 'B',
+  'red': 'R',
+  'green': 'G',
+  'wu': 'WU',
+  'wb': 'WB',
+  'br': 'BR',
+  'bg': 'BG',
+  'ub': 'UB',
+  'ur': 'UR',
+  'rg': 'RG',
+  'rw': 'RW',
+  'gw': 'GW',
+  'gu': 'GU',
+}
+
+async function test() {
+  const res = await doGet(`https://www.mtggoldfish.com/archetype/historic-temur-reclamation#paper`)
+  fs.writeFile('test.txt', res, function (err) {
+    if (err) throw err;
+    console.log('Saved!');
+  })
+  const $ = cheerio.load(res)
+  const bubble = []
+  let content = []
+  const elem = $('.deck-view-deck-table')[0]
+  console.log(elem)
+  $(elem).find('tr').each(function(i, e) {
+    if ($(e).children().hasClass('deck-header')) {
+      console.log(i, trim($(e).find('.deck-header').text()))
+      // console.log(content)
+      if (content.length > 0) {
+        bubble.push({
+          "type": "bubble",
+          "body": {
+            "type": "box",
+            "layout": "vertical",
+            "contents": cloneDeep(content)
+          }
+        })
+        content = []
+      }
+      content.push({
+        "type": "text",
+        "text": `${trim($(e).find('.deck-header').text())}`,
+        "weight": "bold",
+        "size": "lg",
+        "offsetBottom": "5px"
+      })
+    } else {
+      // console.log(trim($(e).find('.deck-col-qty').text()))
+      // console.log(trim($(e).find('.deck-col-card').text()))
+      const qty = trim($(e).find('.deck-col-qty').text())
+      const card = trim($(e).find('.deck-col-card').text())
+      const temp = [{
+        "type": "text",
+        "text": `${qty} ${card}`
+      }]
+      $(e).find('.deck-col-mana .manacost img').each(function(i, e) {
+        temp.push({
+          "type": "icon",
+          "url": `https://import-data.org/images/${manaMap[$(e).attr('alt')]}.png`
+        })
+      })
+      console.log(temp)
+      content.push({
+        "type": "box",
+        "layout": "baseline",
+        "contents": cloneDeep(temp)
+      })
+      // console.log(temp)
+    }
+  })
+
+  const replyJSON = {
+    "type": "carousel",
+    "contents": bubble
+  }
+  // console.log(bubble)
+  client.pushMessage(process.env.ROOMID, {
+    type: 'flex',
+    altText: `historic-temur-reclamation`,
+    contents: replyJSON
+  }).then(res => console.log(res)).catch(err => console.log(err.originalError.response.data))
+}
+
+test()
