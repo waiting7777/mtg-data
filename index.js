@@ -117,7 +117,7 @@ async function pushDailyPrice() {
             "contents": [
               {
                 "type": "text",
-                "text": "M21-Mythic",
+                "text": "ZNR-Mythic",
                 "weight": "bold"
               },
               {
@@ -239,5 +239,5 @@ const getMetaJob = new CronJob('00 01 00 * * *', () => {
 // getPriceJob.start()
 // pushPriceJob.start()
 // getMetaJob.start()
-
+pushDailyPrice()
 // getGoldfishMeta()
