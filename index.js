@@ -76,7 +76,7 @@ async function getPrice(rarity, today, yesterday) {
     const resYesterday = await queryDB(queryString)
     const contents = []
     res.forEach((v, i) => {
-      const diff = +(Number(v.price) - Number(resYesterday[i].price)).toFixed(1)
+      const diff = resYesterday[i].price ? +(Number(v.price) - Number(resYesterday[i].price)).toFixed(1) : 0
 	    const price = (v.price) ? Number(v.price).toFixed(1) : 'NULL'
       contents.push({
         "type": "box",
