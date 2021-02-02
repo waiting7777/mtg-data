@@ -53,15 +53,15 @@ function queryDB(sql) {
 }
 
 async function getDailyPrice() {
-  const resM = await doGet('https://api.scryfall.com/cards/search?q=set:znr+rarity:m')
-  const dataM = resM.data.filter(v => v.collector_number < 274)
+  const resM = await doGet('https://api.scryfall.com/cards/search?q=set:khm+rarity:m')
+  const dataM = resM.data.filter(v => v.collector_number < 275)
   dataM.forEach(d => {
     const queryString = `INSERT INTO daily_price (card_name, rarity, price) values (\"${d.name}\", "Mythic",  \"${d.prices.usd}\")`
     queryDB(queryString)
     console.log(queryString)
   })
-  const resR = await doGet('https://api.scryfall.com/cards/search?q=set:znr+rarity:r')
-  const dataR = resR.data.filter(v => v.collector_number < 274)
+  const resR = await doGet('https://api.scryfall.com/cards/search?q=set:khm+rarity:r')
+  const dataR = resR.data.filter(v => v.collector_number < 275)
   dataR.forEach(d => {
     const queryString = `INSERT INTO daily_price (card_name, rarity, price) values (\"${d.name}\", "Rare", \"${d.prices.usd}\")`
     queryDB(queryString)
@@ -117,7 +117,7 @@ async function pushDailyPrice() {
             "contents": [
               {
                 "type": "text",
-                "text": "ZNR-Mythic",
+                "text": "KHM-Mythic",
                 "weight": "bold"
               },
               {
@@ -141,7 +141,7 @@ async function pushDailyPrice() {
             "contents": [
               {
                 "type": "text",
-                "text": "ZNR-Rare",
+                "text": "KHM-Rare",
                 "weight": "bold"
               },
               {
@@ -174,49 +174,49 @@ const symbolMap = {
   'green': 'G'
 }
 
-async function getGoldfishMeta(type = 'historic') {
-  const res = await doGet(`https://www.mtggoldfish.com/metagame/${type}#paper`)
-  const $ = cheerio.load(res);
-  $('.archetype-tile').each(async function(i, e) {
-    if (i > 11) return
-    const link = $(e).find('.card-image-tile-link-overlay').attr('href')
-    const deck_name = $(e).find('.deck-price-paper a').text()
-    let temp = []
-    $(e).find('.manacost img').each(function(i, e) {
-      temp.push(symbolMap[$(e).attr('alt')])
-    })
-    const symbol = JSON.stringify(temp)
-    const usage_p = trim($(e).find('.col-freq').text())
-    const queryString = `INSERT INTO meta (deck_name, img, usage_p, symbol, type) VALUES (\'${deck_name}\', \'${link}\', \'${usage_p}\', \'${symbol}\', \'${type}\')`
-    const res = await queryDB(queryString)
-    console.log(queryString)
-  })
-}
+// async function getGoldfishMeta(type = 'historic') {
+//   const res = await doGet(`https://www.mtggoldfish.com/metagame/${type}#paper`)
+//   const $ = cheerio.load(res);
+//   $('.archetype-tile').each(async function(i, e) {
+//     if (i > 11) return
+//     const link = $(e).find('.card-image-tile-link-overlay').attr('href')
+//     const deck_name = $(e).find('.deck-price-paper a').text()
+//     let temp = []
+//     $(e).find('.manacost img').each(function(i, e) {
+//       temp.push(symbolMap[$(e).attr('alt')])
+//     })
+//     const symbol = JSON.stringify(temp)
+//     const usage_p = trim($(e).find('.col-freq').text())
+//     const queryString = `INSERT INTO meta (deck_name, img, usage_p, symbol, type) VALUES (\'${deck_name}\', \'${link}\', \'${usage_p}\', \'${symbol}\', \'${type}\')`
+//     const res = await queryDB(queryString)
+//     console.log(queryString)
+//   })
+// }
 
-async function getDeck(type) {
-  const res = await doGet(`https://mtgdecks.net/${type}/date-1`);
-  const $ = cheerio.load(res);
-  let deck_name, usage_p, img
-  $('tbody tr td').each(async function(i, e) {
-    if (i > 29) return
+// async function getDeck(type) {
+//   const res = await doGet(`https://mtgdecks.net/${type}/date-1`);
+//   const $ = cheerio.load(res);
+//   let deck_name, usage_p, img
+//   $('tbody tr td').each(async function(i, e) {
+//     if (i > 29) return
 
-    switch(i % 6) {
-      case 0:
-        img = trim($(this).find('img').attr('src'))
-        break
-      case 1:
-        deck_name = trim($(this).text())
-        break
-      case 2:
-        usage_p = trim($(this).text())
-        break
-      case 5:
-        const queryString = `INSERT INTO meta (deck_name, usage_p, img, type) VALUES (\'${deck_name}\', \'${usage_p}\', \'${img}\', \'${type}\')`
-        const res = await queryDB(queryString)
-        console.log(queryString)
-    }
-  })
-}
+//     switch(i % 6) {
+//       case 0:
+//         img = trim($(this).find('img').attr('src'))
+//         break
+//       case 1:
+//         deck_name = trim($(this).text())
+//         break
+//       case 2:
+//         usage_p = trim($(this).text())
+//         break
+//       case 5:
+//         const queryString = `INSERT INTO meta (deck_name, usage_p, img, type) VALUES (\'${deck_name}\', \'${usage_p}\', \'${img}\', \'${type}\')`
+//         const res = await queryDB(queryString)
+//         console.log(queryString)
+//     }
+//   })
+// }
 
 const getPriceJob = new CronJob('00 00 00 * * *', () => {
   getDailyPrice()
@@ -226,18 +226,18 @@ const pushPriceJob = new CronJob('00 00 08 * * *', () => {
   pushDailyPrice()
 })
 
-const getMetaJob = new CronJob('00 01 00 * * *', () => {
-  getGoldfishMeta('Standard')
-  setTimeout(() => {
-    getGoldfishMeta('Historic')
-  }, 3000)
-  setTimeout(() => {
-    getGoldfishMeta('Modern')
-  }, 6000)
-})
+// const getMetaJob = new CronJob('00 01 00 * * *', () => {
+//   getGoldfishMeta('Standard')
+//   setTimeout(() => {
+//     getGoldfishMeta('Historic')
+//   }, 3000)
+//   setTimeout(() => {
+//     getGoldfishMeta('Modern')
+//   }, 6000)
+// })
 
-// getPriceJob.start()
-// pushPriceJob.start()
+getPriceJob.start()
+pushPriceJob.start()
 // getMetaJob.start()
-pushDailyPrice()
+// pushDailyPrice()
 // getGoldfishMeta()
