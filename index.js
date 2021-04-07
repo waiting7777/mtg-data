@@ -53,15 +53,15 @@ function queryDB(sql) {
 }
 
 async function getDailyPrice() {
-  const resM = await doGet('https://api.scryfall.com/cards/search?q=set:khm+rarity:m')
-  const dataM = resM.data.filter(v => v.collector_number < 275)
+  const resM = await doGet('https://api.scryfall.com/cards/search?q=set:stx+rarity:m')
+  const dataM = resM.data.filter(v => v.collector_number < 285)
   dataM.forEach(d => {
     const queryString = `INSERT INTO daily_price (card_name, rarity, price) values (\"${d.name}\", "Mythic",  \"${d.prices.usd}\")`
     queryDB(queryString)
     console.log(queryString)
   })
-  const resR = await doGet('https://api.scryfall.com/cards/search?q=set:khm+rarity:r')
-  const dataR = resR.data.filter(v => v.collector_number < 275)
+  const resR = await doGet('https://api.scryfall.com/cards/search?q=set:stx+rarity:r')
+  const dataR = resR.data.filter(v => v.collector_number < 285)
   dataR.forEach(d => {
     const queryString = `INSERT INTO daily_price (card_name, rarity, price) values (\"${d.name}\", "Rare", \"${d.prices.usd}\")`
     queryDB(queryString)
@@ -117,7 +117,7 @@ async function pushDailyPrice() {
             "contents": [
               {
                 "type": "text",
-                "text": "KHM-Mythic",
+                "text": "STX-Mythic",
                 "weight": "bold"
               },
               {
@@ -141,7 +141,7 @@ async function pushDailyPrice() {
             "contents": [
               {
                 "type": "text",
-                "text": "KHM-Rare",
+                "text": "STX-Rare",
                 "weight": "bold"
               },
               {
